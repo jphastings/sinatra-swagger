@@ -9,4 +9,5 @@ deploy:
   gem: sinatra-swagger
   on:
     tags: true
+    branch: master
     repo: jphastings/sinatra-swagger
