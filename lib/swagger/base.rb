@@ -25,9 +25,17 @@ module Swagger
       JSON::Validator.add_schema(JSON::Schema.new(data, data['id']))
     end
 
-    def initialize(filepath)
-      @spec = YAML.load(open(filepath))
+    def initialize(data)
+      @spec = data
       JSON::Validator.validate!({ "$ref" => "http://swagger.io/v2/schema.json#" }, @spec)
+    end
+
+    def self.from_file(filepath)
+      new(YAML.load(open(filepath)))
+    end
+
+    def [](key)
+      @spec[key]
     end
   end
 end
