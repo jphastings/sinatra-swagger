@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+- 2.0.0
+- 2.1.2
+deploy:
+  provider: rubygems
+  api_key:
+    secure: f3c7U1z9hulitL8sjYztJmEEgGsCC/X/q/VybFYOC2wsp5D2WggYJ4CTaWcNjCSAWXgVl5L0kOkjKYyItdxVJoyhBa4Mc3MfZo8Dp2UCYpdA+FGd7UbOqbITkr9ZyD22oWk7PgfKeNKoLyffdG9HH/OYJ5ezSa7PB2XMN+Ae2W8=
+  gem: sinatra-swagger
+  on:
+    tags: true
+    repo: jphastings/sinatra-swagger
