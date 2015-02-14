@@ -1,4 +1,4 @@
-require "sinatra/swagger/param_validator"
+require "sinatra/swagger/swagger_linked"
 
 module Sinatra
   module Swagger

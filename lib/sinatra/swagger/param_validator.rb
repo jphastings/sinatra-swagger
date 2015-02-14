@@ -6,6 +6,20 @@ module Sinatra
       def self.registered(app)
         app.register Swagger::SwaggerLinked
 
+        app.helpers do
+          def invalid_params(invalidities)
+            content_type :json
+            halt(
+              400,
+              {
+                error: 'invalid_params',
+                developerMessage: 'Some of the given parameters were invalid according to the Swagger spec.',
+                invalidities: invalidities
+              }.to_json
+            )
+          end
+        end
+
         app.before do
           next if swagger_spec.nil?
           _, captures, spec = swagger_spec.values
@@ -45,7 +59,7 @@ module Sinatra
             nil
           }.compact]
 
-          halt 400, invalidities.to_json if invalidities.any?
+          invalid_params(invalidities) if invalidities.any?
         end
       end
     end
