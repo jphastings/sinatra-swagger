@@ -55,7 +55,20 @@ class Search < Sinatra::Base
 end
 ```
 
-For now, if you were to request `/search/books` (ie. no required 'q' param) or `/search/books?q=penumbra&limit=p` then a `before` hook would catch the error and return a `400` with a JSON description of the issue.
+For now, if you were to request `/search/books?limit=p` then a `before` hook would catch the error and return a `400` with a JSON description of the issue.
+
+```json
+{
+  "error": "invalid_params",
+  "developerMessage": "Some of the given parameters were invalid according to the Swagger spec.",
+  "details": {
+    "invalidities": {
+        "limit": "incorrect_type",
+        "q": "missing"
+    }
+  }
+}
+```
 
 You can override what happens when an invalidity is encountered by overriding the helper method `invalid_params` which takes a hash of invalidities in the form `param_name => issue_description_as_symbol`.
 

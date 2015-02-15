@@ -14,7 +14,9 @@ module Sinatra
               {
                 error: 'invalid_params',
                 developerMessage: 'Some of the given parameters were invalid according to the Swagger spec.',
-                invalidities: invalidities
+                details: {
+                  invalidities: invalidities
+                }
               }.to_json
             )
           end
