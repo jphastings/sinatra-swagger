@@ -8,34 +8,72 @@ module Sinatra
 
         app.helpers do
           def invalid_params(invalidities)
-            content_type :json
-            halt(
-              400,
-              {
-                error: 'invalid_params',
-                developerMessage: 'Some of the given parameters were invalid according to the Swagger spec.',
-                details: {
-                  invalidities: invalidities
-                }
-              }.to_json
+            error_response(
+              'invalid_params',
+              'Some of the given parameters were invalid according to the Swagger spec.',
+              details: { invalidities: invalidities },
+              status: 400
             )
+          end
+
+          def invalid_content_type(acceptable)
+            error_response(
+              'invalid_content',
+              'The ',
+              details: {
+                content_types: {
+                  acceptable: acceptable,
+                  given: request.content_type
+                }
+              },
+              status: 400
+            )
+          end
+
+          def error_response(code, dev_message, details: {}, status: 400)
+            content_type :json
+            halt(status,{
+              error: code,
+              developerMessage: dev_message,
+              details: details
+            }.to_json)
           end
         end
 
         app.before do
           next if swagger_spec.nil?
           _, captures, spec = swagger_spec.values
+          invalid_content_type(spec['consumes']) if spec['consumes'] && !spec['consumes'].include?(request.content_type)
+
+          unknown_params = params.keys.select { |k| k.is_a?(String) }
 
           invalidities = Hash[(spec['parameters'] || []).map { |details|
             param_name = details['name']
+            unknown_params.delete(param_name)
 
             parameter = case details['in']
             when "query"
               params[param_name]
             when "path"
               captures[param_name]
+            when "body"
+              request.body.rewind
+              params[:body] = request.body.read
+              next nil unless request.content_type =~ %r{^application/(?:.+\+)?json}
+
+              begin
+                params[:body] = JSON.parse(params[:body])
+              rescue JSON::ParserError
+                next ['POST body', :invalid_json]
+              end
+              next nil unless details['schema']
+
+              schema = details['schema'].merge('definitions' => settings.swagger['definitions'])
+              errors = JSON::Validator.fully_validate(schema, params[:body])
+              next errors.empty? ? nil : ['POST body', errors]
             else
-              raise NotImplementedError, "Can't cope with #{details['in']} parameters right now"
+              # other param types aren't dealt with at the moment
+              next
             end
 
             if !parameter
@@ -61,7 +99,10 @@ module Sinatra
             nil
           }.compact]
 
-          invalid_params(invalidities) if invalidities.any?
+          if invalidities.any?
+            unknown_params.each { |p| invalidities[p] = :unexpected_key }
+            invalid_params(invalidities)
+          end
         end
       end
     end

@@ -15,7 +15,7 @@ module Sinatra
           begin
             JSON::Validator.validate!(schema, body)
           rescue JSON::Schema::ValidationError => e
-            e.message = "Response JSON did not match the Swagger schema: #{e.message}"
+            e.message = "Response JSON did not match the Swagger schema: #{e.message}\n#{body}"
             raise e
           end
         end
