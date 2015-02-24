@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '~> 2.0'
 
-  s.add_dependency "json-schema", "~> 2.5" # NB. requires merge of issue #244 as well
+  s.add_dependency "json-schema", "~> 2.5", ">= 2.5.1"
   s.add_dependency "sinatra", "~> 1.4"
 
   s.add_development_dependency "rake", "~> 10.4"
