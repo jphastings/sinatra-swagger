@@ -4,6 +4,31 @@ Extensions & helper methods for accesing your swagger documentation from within 
 
 This library is in the *very* early stages of development, there will be 'obvious' features that are missing and wild inefficiencies, but please feel free to file issues/enhancements if there's anything you think would be useful.
 
+## Recommended Setup
+
+This extension encorporates all the extensions in a way that makes sense for most web applications, it's included by default for "classic" style applications.
+
+```
+require "sinatra"
+require "sinatra/swagger"
+
+swagger "my-swagger.yaml"
+
+# …etc
+```
+
+```
+require "sinatra/base"
+require "sinatra/swagger"
+
+class Search < Sinatra::Base
+  register Sinatra::Swagger::RecommendedSetup
+  swagger "my-swagger.yaml"
+
+  # …etc
+end
+```
+
 ## Param Validator
 
 This extension will use the `parameters` component of the route being accessed from your Swagger document to type cast your incoming parameters and raise `400` errors if any are incorrect:
@@ -116,3 +141,49 @@ end
 The `after` hook will check the response body and will run the schema validation and raise a `JSON::Schema::ValidationError` exception as the output doesn't match the schema.
 
 In order to not be restrictive, if the output doesn't look like JSON or if there's no schema defined, then no action will be taken and the body will be sent to the client.
+
+## Spec Verb
+
+This module configures your application to respond to requests to the root (`/`) using the **SPEC** verb. The response is `text/vnd.swagger.v2+yaml` with the full swagger document that your server is using.
+
+```ruby
+require "sinatra/base"
+require "sinatra/swagger"
+
+class Search < Sinatra::Base
+  register Sinatra::Swagger::SpecVerb
+  swagger "swagger/shows.yaml"
+end
+```
+
+Inspecting a curl request:
+
+```bash
+$ curl -v -X SPEC http://127.0.0.1:9292
+> SPEC / HTTP/1.1
+> User-Agent: curl/7.37.1
+> Host: 127.0.0.1:9292
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Content-Type: text/vnd.swagger.v2+yaml; charset=utf-8
+---
+swagger: 2.0
+paths:
+  /shows/{showId}:
+  # …etc
+```
+
+## Version Header
+
+Adds an `X-Application-Version` header to every response which is set to the application title and version as set in the Swagger document, eg. `X-Application-Version: Application Title (0.1.0)`
+
+```ruby
+require "sinatra/base"
+require "sinatra/swagger"
+
+class Search < Sinatra::Base
+  register Sinatra::Swagger::VersionHeader
+  swagger "swagger/shows.yaml"
+end
+```

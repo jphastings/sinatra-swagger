@@ -107,6 +107,4 @@ module Sinatra
       end
     end
   end
-
-  register Swagger::ParamValidator
 end
