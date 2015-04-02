@@ -38,5 +38,5 @@ module Swagger
     end
   end
 
-  Base.include(RackHelpers)
+  Base.send(:include, RackHelpers)
 end
