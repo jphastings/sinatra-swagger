@@ -75,7 +75,7 @@ class Search < Sinatra::Base
     # Sinatra::Swagger has ensured limit is integer-like, is one or bigger, and will be set to 20 if not given by the user
     limit = params['limit']
 
-    swagger_spec # => is the hash from the spec at `paths./search/{type}.get`
+    swagger_spec # => is the hash from the spec at `paths/search/{type}.get`
   end
 end
 ```
