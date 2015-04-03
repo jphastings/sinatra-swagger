@@ -19,6 +19,8 @@ module Swagger
   end
 
   class Base
+    attr_reader :spec
+    
     # Pre-load JSON-schema files used for validation
     Dir.glob(File.join(__dir__, "../../schema/*-schema.json")) do |schema|
       data = JSON.parse(File.read(schema))
