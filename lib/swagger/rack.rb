@@ -3,7 +3,7 @@ require "swagger/base"
 module Swagger
   module RackHelpers
     def request_spec(env: nil)
-      path = env['REQUEST_PATH']
+      path = env['REQUEST_PATH'] || env['PATH_INFO']
       verb = env['REQUEST_METHOD'].downcase
       matching_paths = (@spec['paths'] || {}).map { |spec_path, spec|
         next unless spec[verb]
